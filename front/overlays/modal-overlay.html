@@ -1,0 +1,33 @@
+<div class="modal-overlay" id="modal-delete" role="dialog" aria-modal="true" aria-labelledby="modal-delete-title" hidden>
+    <div class="modal">
+ 
+      <!-- 경고 아이콘 -->
+      <div class="modal__icon-wrap" aria-hidden="true">⚠️</div>
+ 
+      <!-- 타이틀 -->
+      <h2 class="modal__title" id="modal-delete-title">이 기록을 삭제할까요?</h2>
+ 
+      <!-- 설명 -->
+      <p class="modal__desc">
+        삭제하면 되돌릴 수 없어요.<br>
+        원문과 순화 결과가 함께 지워집니다.
+      </p>
+ 
+      <!-- 프라이버시 안내 -->
+      <div class="privacy-notice">
+        <span class="privacy-notice__icon" aria-hidden="true">🛡</span>
+        <span>
+          <strong>프라이버시 안내</strong> · 입력 문장은 기기에만 저장돼요.
+          삭제 시 서버 로그까지 즉시 영구 삭제됩니다.
+        </span>
+      </div>
+ 
+      <!-- 액션 버튼 -->
+      <div class="modal__actions">
+        <button class="btn btn--secondary" id="btn-cancel-delete" aria-label="삭제 취소">취소</button>
+        <!-- DELETE /api/records/{id}/ -->
+        <button class="btn btn--danger"    id="btn-confirm-delete" aria-label="삭제 확인">삭제</button>
+      </div>
+ 
+    </div>
+  </div>

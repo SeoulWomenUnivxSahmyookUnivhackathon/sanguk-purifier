@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>상욕순화기</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<script src="script.js"></script>
+<section id="screen-loading" class="screen" aria-label="변환 중 화면" aria-live="polite">
+ 
+    <!-- 상단 바 -->
+    <header class="top-bar">
+      <h1 class="top-bar__logo">상<span class="accent">욕</span>순화기</h1>
+      <a href="./index.html" class="top-bar__icon-btn" id="btn-back-from-history" aria-label="뒤로가기">
+        <img src="./icons/back-icon.svg" />
+      </a>
+    </header>
+ 
+    <!-- 로딩 카드 (스켈레톤 UI) -->
+    <div class="loading-card" role="status">
+      <!-- 로딩 헤더 -->
+      <div class="loading-header">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>AI가 말을 다듬는 중…</span>
+      </div>
+ 
+      <!-- 스켈레톤: 배지 행 -->
+      <div class="skeleton-row">
+        <div class="skeleton skeleton--text-sm"></div>
+        <div class="skeleton skeleton--text-sm" style="width:20%; margin-left: auto;"></div>
+      </div>
+ 
+      <!-- 스켈레톤: 원문 영역 -->
+      <div class="skeleton skeleton--text-lg"></div>
+ 
+      <!-- 스켈레톤: 순화 결과 블록 -->
+      <div class="skeleton skeleton--block"></div>
+ 
+      <!-- 스켈레톤: 버튼 행 -->
+      <div class="skeleton skeleton--btn"></div>
+      <div class="skeleton-row">
+        <div class="skeleton skeleton--btn-sm"></div>
+        <div class="skeleton skeleton--btn-sm"></div>
+      </div>
+    </div>
+ 
+    <!-- 안내 문구 -->
+    <p class="loading-hint">보통 1~2초면 끝나요</p>
+
+    <!-- 이동 확인용 임시 링크@@@@ (삭제 가능@@@@)-->
+    <a href="./result.html"> 이동용 임시 링크입니다. 삭제 가능 </a>
+ 
+    <!-- 에러 토스트 (변환 실패 시 노출) — 기본 hidden -->
+    <div class="toast toast--error" id="toast-error" role="alert" hidden>
+      <span>⚠️ 변환에 실패했어요</span>
+      <button class="toast__retry-btn" id="btn-retry">다시 시도</button>
+    </div>
+ 
+  </section>
+  </body>
+</html>

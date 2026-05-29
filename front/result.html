@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>상욕순화기</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<script src="script.js"></script>
+<section id="screen-result" class="screen" aria-label="변환 결과 화면">
+ 
+    <!-- 상단 바 (뒤로가기) -->
+    <header class="top-bar">
+      <h1 class="top-bar__logo">상<span class="accent">욕</span>순화기</h1>
+      <a href="./history.html" class="top-bar__icon-btn" id="btn-back-from-result" aria-label="뒤로가기">
+        <img src="./icons/back-icon.svg" />
+      </a>
+    </header>
+ 
+    <!-- 결과 카드 -->
+    <div class="result-card">
+      <!-- 배지 행: severity_score & mode -->
+      <div class="result-card__badges">
+        <!-- API: severity_score (0~10 → 0~100 으로 표시) -->
+        <span class="badge badge--severity" id="result-severity">심각도 <strong id="result-severity-value">85</strong></span>
+        <!-- API: mode -->
+        <span class="badge badge--mode" id="result-mode-badge">선비</span>
+      </div>
+ 
+      <!-- 원문 행 — API: original_text -->
+      <div class="original-text-box">
+        <span class="original-text-box__label">원문</span>
+        <span class="original-text-box__value" id="result-original-text">아 ㅈㄴ 어이없네 진짜</span>
+      </div>
+ 
+      <!-- 순화 완료 배지 -->
+      <span class="purified-label">순화 완료</span>
+ 
+      <!-- 순화 결과 — API: purified_text -->
+      <div class="purified-result-card" id="result-purified-text">
+        "허, 이는 참으로 어처구니없는 일이로다."
+      </div>
+    </div>
+ 
+    <!-- 액션 버튼 -->
+    <div class="action-buttons">
+      <div class="action-buttons__row">
+        <!-- 다시 변환 (홈으로 이동) -->
+        <a href="./detail.html" class="btn btn--secondary" id="btn-re-convert" aria-label="다시 변환">
+          <img src="./icons/update-icon.svg"> 다시 변환
+        </a>
+      </div>
+    </div>
+ 
+  </section>
+  </body>
+</html>

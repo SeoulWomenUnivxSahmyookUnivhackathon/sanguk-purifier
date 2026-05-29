@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>상욕순화기</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<script src="script.js"></script>
+<section id="screen-detail" class="screen" aria-label="기록 상세 및 편집 화면">
+ 
+    <!-- 상단 바 (뒤로가기) -->
+    <header class="top-bar">
+      <h1 class="top-bar__logo">상<span class="accent">욕</span>순화기</h1>
+      <a href="./history.html" class="top-bar__icon-btn" id="btn-back-from-detail" aria-label="뒤로가기">
+        <img src="./icons/back-icon.svg" />
+      </a>
+    </header>
+ 
+    <!-- 메타 정보: 날짜 + 심각도 -->
+    <div class="detail-meta">
+      <!-- API: created_at -->
+      <span class="detail-meta__date" id="detail-date">오늘 14:20</span>
+      <!-- API: severity_score -->
+      <span class="badge badge--severity">
+        심각도 <strong id="detail-severity-value">85</strong>
+      </span>
+    </div>
+ 
+    <!-- 원문 ↔ 결과 비교 -->
+    <div class="detail-compare">
+      <p class="section-label">원문</p>
+      <!-- API: original_text (편집 시 PATCH /api/records/{id}/) -->
+      <div class="detail-compare__original-box" id="detail-original-text">
+        아 ㅈㄴ 어이없네 진짜
+      </div>
+ 
+      <!-- 화살표 -->
+      <div class="compare-arrow" aria-hidden="true">↓</div>
+ 
+      <p class="section-label">순화 결과</p>
+      <!-- API: purified_text -->
+      <div class="detail-compare__purified-box" id="detail-purified-text">
+        "허, 이는 참으로 어처구니없는 일이로다."
+      </div>
+    </div>
+    <!-- 말투 모드 변경 (PUT body: mode) -->
+    <div class="mode-change-section">
+      <p class="section-label">말투 모드 변경</p>
+      <div class="mode-chip-group" role="group" aria-label="모드 선택">
+        <button class="mode-chip mode-chip--active" data-mode="scholar" aria-pressed="true">선비</button>
+        <button class="mode-chip" data-mode="trend"     aria-pressed="false">어쩔티비</button>
+        <button class="mode-chip" data-mode="cute"      aria-pressed="false">주접</button>
+        <button class="mode-chip" data-mode="rant"      aria-pressed="false">뿌잉뿌잉</button>
+        <button class="mode-chip" data-mode="interview" aria-pressed="false">공손</button>
+      </div>
+    </div>
+ 
+    <!-- 재순화 CTA — PUT /api/records/{id}/ -->
+    <div class="cta-section">
+      <a href="loading.html" class="btn btn--primary" id="btn-re-purify" aria-label="이 모드로 재순화">
+        <img src="./icons/update-icon.svg"> 이 모드로 재순화
+      </a>
+    </div>
+ 
+  </section>
+  </body>
+  </html>

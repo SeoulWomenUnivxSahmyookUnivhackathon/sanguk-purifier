@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>상욕순화기</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<script src="script.js"></script>
+<section id="screen-history" class="screen" aria-label="변환 이력 화면">
+ 
+    <!-- 상단 바 (뒤로가기) -->
+    <header class="top-bar">
+      <h1 class="top-bar__logo" style="font-size:28px; font-weight:900;">
+        변환 <span class="accent">이력</span>
+      </h1>
+      <a href="./index.html" class="top-bar__icon-btn" id="btn-back-from-history" aria-label="뒤로가기">
+        <img src="./icons/back-icon.svg" />
+      </a>
+    </header>
+ 
+    <!-- 필터 & 정렬 -->
+    <div class="history-header">
+      <!-- 모드 필터 칩 (mode 쿼리 파라미터) -->
+      <div class="filter-chips" role="group" aria-label="모드 필터">
+        <button class="mode-chip mode-chip--active" data-filter="all"       aria-pressed="true">전체</button>
+        <button class="mode-chip" data-filter="scholar"   aria-pressed="false">선비</button>
+        <button class="mode-chip" data-filter="trend"     aria-pressed="false">어쩔티비</button>
+        <button class="mode-chip" data-filter="interview" aria-pressed="false">공손</button>
+      </div>
+ 
+      <!-- 정렬 (sort 쿼리 파라미터, 기본 -created_at) -->
+      <button class="sort-btn" id="btn-sort" aria-label="정렬 기준 변경">
+        ↕ 최신순
+      </button>
+    </div>
+ 
+    <!-- 이력 카드 리스트 — API results[] 배열 렌더링 -->
+    <ul class="history-list" id="history-list" aria-label="변환 이력 목록">
+ 
+      <!-- 이력 아이템 (반복 단위) — record 객체 1건 -->
+      <li class="history-item" data-record-id="15" role="button" tabindex="0" aria-label="기록 상세 보기">
+        <!-- href로 감싸서 이동 실험 해보았습니다 -->
+        <a href="./detail.html">
+        <div class="history-item__header">
+          <!-- API: created_at 포맷 -->
+          <span class="history-item__date">오늘 14:20</span>
+          <div class="history-item__right">
+            <!-- API: mode -->
+            <span class="badge badge--mode">선비</span>
+            <!-- DELETE /api/records/{id}/ -->
+            <button class="delete-btn" data-record-id="15" aria-label="이 기록 삭제">🗑</button>
+          </div>
+        </div>
+        <!-- API: original_text -->
+        <p class="history-item__original">아 ㅈㄴ 어이없네 진짜</p>
+        <!-- API: purified_text -->
+        <p class="history-item__purified">"허, 이는 참으로 어처구니없는 일이로다."</p>
+        </a>
+      </li>
+ 
+      <li class="history-item" data-record-id="12" role="button" tabindex="0" aria-label="기록 상세 보기">
+        <div class="history-item__header">
+          <span class="history-item__date">어제 09:15</span>
+          <div class="history-item__right">
+            <span class="badge badge--mode-outline">공손</span>
+            <button class="delete-btn" data-record-id="12" aria-label="이 기록 삭제">🗑</button>
+          </div>
+        </div>
+        <p class="history-item__original">개빡치네 진짜</p>
+        <p class="history-item__purified">정말 화가 많이 나네요.</p>
+      </li>
+ 
+      <li class="history-item" data-record-id="10" role="button" tabindex="0" aria-label="기록 상세 보기">
+        <div class="history-item__header">
+          <span class="history-item__date">24.05.27</span>
+          <div class="history-item__right">
+            <span class="badge badge--mode-outline">어쩔티비</span>
+            <button class="delete-btn" data-record-id="10" aria-label="이 기록 삭제">🗑</button>
+          </div>
+        </div>
+        <p class="history-item__original">장난하냐?</p>
+        <p class="history-item__purified">어쩔ㅋㅋ 지금 농담하는 거?</p>
+      </li>
+ 
+    </ul>
+ 
+    <!-- 빈 상태 (이력 없을 때) -->
+    <div class="empty-state" id="history-empty" hidden>
+      <span class="empty-state__icon">📭</span>
+      <p>아직 변환한 문장이 없어요</p>
+      <button class="btn btn--primary" id="btn-go-home-from-history" style="width:auto; padding: 12px 24px;">
+        첫 변환하러 가기
+      </button>
+    </div>
+ 
+  </section>
+  </body>
+  </html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>상욕순화기</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <script src="script.js"></script>
+    <section id="screen-home" class="screen screen--active" aria-label="홈 화면">
+ 
+    <!-- 상단 바 -->
+    <header class="top-bar">
+      <h1 class="top-bar__logo">상<span class="accent">욕</span>순화기</h1>
+      <!-- 변환 이력 화면으로 이동 -->
+      <a href="./history.html" class="top-bar__icon-btn" id="btn-go-history" aria-label="변환 이력 보기">
+        <img src="./icons/history-icon.svg" />
+      </a>
+    </header>
+ 
+    <!-- 히어로 카피 -->
+    <div class="hero">
+      <h2 class="hero__title">
+        거친 말, <span class="highlight">감정은 그대로</span><br>표현만 싹.
+      </h2>
+      <p class="hero__subtitle">문장을 넣고 말투를 고르면 끝.</p>
+    </div>
+ 
+    <!-- 말투 모드 선택 (mode 파라미터) -->
+    <div class="mode-section">
+      <p class="section-label">말투 모드</p>
+      <div class="mode-chip-group" role="group" aria-label="말투 모드 선택">
+        <!-- scholar | trend | cute | rant | interview -->
+        <button class="mode-chip mode-chip--active" data-mode="scholar" aria-pressed="true">선비</button>
+        <button class="mode-chip" data-mode="trend"     aria-pressed="false">어쩔티비</button>
+        <button class="mode-chip" data-mode="cute"      aria-pressed="false">주접</button>
+        <button class="mode-chip" data-mode="rant"      aria-pressed="false">뿌잉뿌잉</button>
+        <button class="mode-chip" data-mode="interview" aria-pressed="false">공손</button>
+      </div>
+    </div>
+ 
+    <!-- 입력 영역 -->
+    <div class="input-section">
+      <!-- original_text: POST /api/records/ -->
+      <div class="input-wrapper">
+        <textarea
+          id="original_text"
+          name="original_text"
+          maxlength="300"
+          placeholder="여기에 거친 말을 입력해봐.&#10;예) 아 ㅈㄴ 어이없네 진짜"
+          aria-label="욕설 입력"
+        ></textarea>
+      </div>
+      <!-- 글자 수 카운터 (0/300) -->
+      <div class="char-counter" id="char-counter" aria-live="polite">0 / 300</div>
+    </div>
+ 
+    <!-- 순화하기 CTA -->
+    <div class="cta-section">
+      <a href="./loading.html" class="btn btn--primary" id="btn-convert" disabled aria-label="순화하기" >
+        순화하기
+      </a>
+    </div>
+ 
+  </section>
+</body>
+</html>
