@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>순화 수정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 32px;
+        }
+
+        .current {
+            background: #f8f8f8;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .current strong {
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #6c63ff;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .mode-btn {
+            padding: 10px 4px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .mode-btn:hover {
+            border-color: #6c63ff;
+            background: #f3f2ff;
+        }
+
+        .mode-btn.selected {
+            border-color: #6c63ff;
+            background: #6c63ff;
+            color: white;
+        }
+
+        .mode-btn .emoji {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #5a52d5;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #999;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>✏️ 재순화하기</h1>
+
+        <div class="current">
+            <strong>현재 순화 결과:</strong><br>
+            {{ record.purified_text }}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <textarea name="original_text" required>{{ record.original_text }}</textarea>
+
+            <div class="mode-grid">
+                <label class="mode-btn {% if record.mode == 'scholar' %}selected{% endif %}"
+                    onclick="selectMode(this, 'scholar')">
+                    <span class="emoji">🎓</span>선비 모드
+                </label>
+                <label class="mode-btn {% if record.mode == 'trend' %}selected{% endif %}"
+                    onclick="selectMode(this, 'trend')">
+                    <span class="emoji">📺</span>어쩔티비
+                </label>
+                <label class="mode-btn {% if record.mode == 'cute' %}selected{% endif %}"
+                    onclick="selectMode(this, 'cute')">
+                    <span class="emoji">🐰</span>뿌잉뿌잉
+                </label>
+                <label class="mode-btn {% if record.mode == 'rant' %}selected{% endif %}"
+                    onclick="selectMode(this, 'rant')">
+                    <span class="emoji">🔥</span>주접 모드
+                </label>
+                <label class="mode-btn {% if record.mode == 'interview' %}selected{% endif %}"
+                    onclick="selectMode(this, 'interview')">
+                    <span class="emoji">💼</span>면접 모드
+                </label>
+            </div>
+            <input type="hidden" name="mode" id="modeInput" value="{{ record.mode }}">
+
+            <button type="submit" class="submit-btn">✨ 재순화하기</button>
+        </form>
+        <a href="{% url 'record_list' %}" class="back-link">← 기록으로 돌아가기</a>
+    </div>
+
+    <script>
+        function selectMode(el, mode) {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('modeInput').value = mode;
+        }
+    </script>
+</body>
+
+</html>

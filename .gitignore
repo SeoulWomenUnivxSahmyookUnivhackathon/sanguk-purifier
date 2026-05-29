@@ -1,0 +1,25 @@
+# 가상환경
+venv/
+env/
+.venv/
+
+# 환경변수 (API 키!)
+.env
+.env.*
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# DB
+*.sqlite3
+
+# Django 미디어
+media/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

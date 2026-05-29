@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>순화 기록</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 24px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: #6c63ff;
+            background: #6c63ff;
+            color: white;
+        }
+
+        .sort-select {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .mode-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #f3f2ff;
+            color: #6c63ff;
+        }
+
+        .score {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .score span {
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .text-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .text-box {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .original {
+            background: #fff5f5;
+            border-left: 3px solid #ff6b6b;
+        }
+
+        .purified {
+            background: #f0fff4;
+            border-left: 3px solid #51cf66;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #999;
+            margin-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: #f3f2ff;
+            color: #6c63ff;
+        }
+
+        .btn-delete {
+            background: #fff5f5;
+            color: #ff6b6b;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+        }
+
+        .new-btn {
+            display: block;
+            text-align: center;
+            padding: 16px;
+            background: #6c63ff;
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        .new-btn:hover {
+            background: #5a52d5;
+        }
+
+        .date {
+            font-size: 0.75rem;
+            color: #bbb;
+            margin-top: 8px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📋 순화 기록</h1>
+        <a href="{% url 'index' %}" class="new-btn">🤬 새로 순화하기</a>
+
+        <div class="toolbar">
+            <a href="{% url 'record_list' %}" class="filter-btn {% if not current_mode %}active{% endif %}">전체</a>
+            {% for value, label in modes %}
+            <a href="{% url 'record_list' %}?mode={{ value }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                class="filter-btn {% if current_mode == value %}active{% endif %}">{{ label }}</a>
+            {% endfor %}
+            <select class="sort-select"
+                onchange="location='{% url 'record_list' %}?sort='+this.value+'{% if current_mode %}&mode={{ current_mode }}{% endif %}'">
+                <option value="-created_at">최신순</option>
+                <option value="created_at">오래된순</option>
+                <option value="-severity_score">심각도 높은순</option>
+                <option value="severity_score">심각도 낮은순</option>
+            </select>
+        </div>
+
+        {% if records %}
+        {% for record in records %}
+        <div class="card">
+            <div class="card-header">
+                <span class="mode-badge">{{ record.get_mode_display }}</span>
+                <span class="score">심각도 <span>{{ record.severity_score }}/10</span></span>
+            </div>
+            <div class="text-row">
+                <div class="text-box original">
+                    <div class="label">🤬 원본</div>
+                    {{ record.original_text }}
+                </div>
+                <div class="text-box purified">
+                    <div class="label">✨ 순화</div>
+                    {{ record.purified_text }}
+                </div>
+            </div>
+            <div class="date">{{ record.created_at|date:"Y.m.d H:i" }}</div>
+            <div class="card-footer">
+                <a href="{% url 'update' record.pk %}" class="btn btn-edit">✏️ 수정</a>
+                <form method="POST" action="{% url 'delete' record.pk %}" style="display:inline"
+                    onsubmit="return confirm('삭제할까요?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-delete">🗑️ 삭제</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty">
+            <p>아직 순화 기록이 없어요!</p>
+            <p>첫 번째 욕설을 순화해보세요 😄</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>
