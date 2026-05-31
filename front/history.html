@@ -124,7 +124,7 @@ function formatDate(isoStr) {
 }
 
 function showToast(msg, type = 'ok') {
-  document.querySelectorAll('.tok-wrap').forEach(e => e.remove());
+  document.querySelectorAll('.tok-wrap, .sok-toast-wrapper').forEach(e => e.remove());
   const icon = type === 'ok'
     ? `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m20 6-11 11-5-5"/></svg>`
     : `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>`;

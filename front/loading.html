@@ -88,10 +88,18 @@
           }, 350);
         } else if (apiError) {
           clearInterval(tickInterval);
+          
+          // 하단 안내 푸터 문구를 숨겨서 에러 토스트와 겹치지 않게 합니다.
+          const ldFoot = document.querySelector('.ld-foot');
+          if (ldFoot) {
+            ldFoot.style.opacity = '0';
+            ldFoot.style.transition = 'opacity 0.2s';
+          }
+          
           showToast(apiError.message || '순화 처리에 실패했습니다.', 'err');
           setTimeout(() => {
             window.location.href = 'index.html';
-          }, 1500);
+          }, 2200);
         }
       }
     }, 550); // 각 스텝당 550ms 연출

@@ -153,7 +153,7 @@ const Store = {
  * type: 'ok' | 'err'
  */
 function showToast(message, type = 'ok', duration = 2200) {
-  document.querySelectorAll('.sok-toast-wrapper').forEach(el => el.remove());
+  document.querySelectorAll('.sok-toast-wrapper, .tok-wrap').forEach(el => el.remove());
 
   const checkIcon = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none"
     stroke="currentColor" stroke-width="2.2"><path d="m20 6-11 11-5-5"/></svg>`;
