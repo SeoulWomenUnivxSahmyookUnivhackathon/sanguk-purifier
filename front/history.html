@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상욕순화기 · 변환 이력</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sok screen sok-surface sok-grid">
+  <div class="sok-pad sok-z">
+
+    <div class="sok-appbar">
+      <h1 class="sok-h1 history-title">변환 이력</h1>
+      <button class="sok-iconbtn" id="btnBack" title="홈">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="sok-seg history-filter" id="filterBar">
+      <span class="sok-segpill on">전체</span>
+      <span class="sok-segpill" data-mode="scholar">선비</span>
+      <span class="sok-segpill" data-mode="trend">어쩔티비</span>
+      <span class="sok-segpill" data-mode="cute">뿌잉뿌잉</span>
+      <span class="sok-segpill" data-mode="rant">주접</span>
+      <span class="sok-segpill" data-mode="interview">면접</span>
+    </div>
+
+    <div class="sok-seg history-sort">
+      <span class="sok-sortbtn" id="btnSort">
+        <svg class="ic" viewBox="0 0 24 24">
+          <path d="M7 4v16"/><path d="m3 8 4-4 4 4"/>
+          <path d="M17 20V4"/><path d="m21 16-4 4-4-4"/>
+        </svg>최신순
+      </span>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <!-- 삭제 모달 -->
+  <div class="sok-modal-scrim" id="deleteModal" style="display:none">
+    <div class="sok-dialog">
+      <span class="warnicon">
+        <svg class="ic" viewBox="0 0 24 24">
+          <path d="M12 9v4"/><path d="M12 17h.01"/>
+          <path d="M10.3 4 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/>
+        </svg>
+      </span>
+      <h3>이 기록을 삭제할까요?</h3>
+      <p>삭제하면 되돌릴 수 없어요. 원문과 순화 결과가 함께 지워집니다.</p>
+      <div class="sok-privacy">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V6z"/></svg>
+        <p><b style="color:var(--text-2)">프라이버시</b> · 기록은 내 세션에만 연결돼요. 삭제 시 데이터베이스에서 완전히 제거됩니다.</p>
+      </div>
+      <div class="actions">
+        <button class="sok-btn" style="flex:1" id="btnCancel">취소</button>
+        <button class="sok-danger-btn" id="btnConfirmDelete">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   history_standalone.html
+   USE_DUMMY = true  → 더미 데이터로 UI 확인
+   USE_DUMMY = false → 실제 Django API (localhost:8000) 연결
+   ========================================================= */
+
+const USE_DUMMY = false;
+
+/* ── API Base URL ──────────────────────────────────────────
+   상대경로('')를 지정하여 호스트(127.0.0.1 vs localhost) 간 CORS 충돌 방지 */
+const BASE_URL = '';
+
+/* ── CSRF 토큰 파싱 (Django 세션 쿠키) ── */
+function getCsrf() {
+  return document.cookie.split('; ')
+    .find(r => r.startsWith('csrftoken='))?.split('=')[1] ?? '';
+}
+
+/* ── 공통 fetch 래퍼 ──────────────────────────────────────
+   - credentials: 'include' → Django 세션 쿠키 자동 포함 (필수)
+   - CSRF 헤더 자동 삽입
+   - CORS/네트워크 에러는 .catch()로 별도 포착               */
+async function apiFetch(path, options = {}) {
+  const method  = (options.method || 'GET').toUpperCase();
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (['POST','PUT','PATCH','DELETE'].includes(method)) {
+    const csrf = getCsrf();
+    if (csrf) headers['X-CSRFToken'] = csrf;
+  }
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    ...options, method, headers,
+    credentials: 'include',   // 명세서: 세션 쿠키 기반 인증 필수
+  }).catch(() => {
+    throw new Error('서버에 연결할 수 없어요. Django 서버(8000)가 실행 중인지 확인해 주세요.');
+  });
+
+  if (res.status === 204) return null;  // DELETE 성공 — body 없음
+
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new Error(data?.error || `HTTP ${res.status}`);
+  }
+  return data;
+}
+
+/* ── 유틸 ── */
+const MODE_LABELS = { scholar:'선비', trend:'어쩔티비', cute:'뿌잉뿌잉', rant:'주접', interview:'면접' };
+const modeLabel = m => MODE_LABELS[m] ?? m;
+const escHtml   = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function formatDate(isoStr) {
+  const d = new Date(isoStr), now = new Date();
+  const diff = now - d, oneDay = 86400000;
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  if (diff < oneDay && d.getDate() === now.getDate()) return `오늘 ${hh}:${mm}`;
+  if (diff < oneDay * 2) return `어제 ${hh}:${mm}`;
+  return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function showToast(msg, type = 'ok') {
+  document.querySelectorAll('.tok-wrap').forEach(e => e.remove());
+  const icon = type === 'ok'
+    ? `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m20 6-11 11-5-5"/></svg>`
+    : `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>`;
+  const w = Object.assign(document.createElement('div'), { className: 'tok-wrap' });
+  w.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:999;';
+  w.innerHTML = `<div class="sok-toast ${type}">${icon} ${msg}</div>`;
+  document.body.appendChild(w);
+  setTimeout(() => { w.style.transition='opacity .3s'; w.style.opacity='0'; setTimeout(()=>w.remove(),300); }, 2200);
+}
+
+const Store = {
+  set(k, v) { try { sessionStorage.setItem('sok_'+k, JSON.stringify(v)); } catch(_){} },
+  get(k)    { try { return JSON.parse(sessionStorage.getItem('sok_'+k)); } catch(_){ return null; } },
+};
+
+/* ── 더미 데이터 (USE_DUMMY = true 일 때만 사용) ── */
+const DUMMY_RECORDS = [
+  { id:1, original_text:'아 ㅈㄴ 어이없네 진짜',    purified_text:'허, 이는 참으로 어처구니없는 일이로다.', mode:'scholar',   severity_score:8,
+    created_at: new Date(Date.now()-1000*60*30).toISOString(),    updated_at: new Date(Date.now()-1000*60*10).toISOString() },
+  { id:2, original_text:'개빡치네 진짜',             purified_text:'지금 상황이 많이 답답하네요.',           mode:'interview', severity_score:7,
+    created_at: new Date(Date.now()-1000*60*60*27).toISOString(), updated_at: new Date(Date.now()-1000*60*60*27).toISOString() },
+  { id:3, original_text:'장난하냐?',                purified_text:'어쩔ㅋㅋ 지금 농담하는 거?',             mode:'trend',     severity_score:3,
+    created_at: new Date(Date.now()-1000*60*60*72).toISOString(), updated_at: new Date(Date.now()-1000*60*60*72).toISOString() },
+  { id:4, original_text:'진짜 너무하는 거 아니야?',  purified_text:'뿌잉~ 너무해뿌잉 이건 좀 심한 거 아니에용~?', mode:'cute', severity_score:5,
+    created_at: new Date(Date.now()-1000*60*60*96).toISOString(), updated_at: new Date(Date.now()-1000*60*60*96).toISOString() },
+];
+
+/* ── 상태 ── */
+let allRecords      = [];
+let currentMode     = '';
+let currentSort     = 'newest';
+let pendingDeleteId = null;
+
+/* ── 요소 ── */
+const listEl      = document.getElementById('historyList');
+const filterBar   = document.getElementById('filterBar');
+const btnSort     = document.getElementById('btnSort');
+const deleteModal = document.getElementById('deleteModal');
+
+/* ── 이벤트 바인딩 ── */
+
+// 1. 뒤로가기 → index.html
+document.getElementById('btnBack').addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+// 3. segpill 필터 — data-mode 없는 "전체"는 '' 처리
+filterBar.querySelectorAll('.sok-segpill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    filterBar.querySelectorAll('.sok-segpill').forEach(p => p.classList.remove('on'));
+    pill.classList.add('on');
+    currentMode = pill.dataset.mode ?? '';
+    renderList();
+  });
+});
+
+// 4. 정렬 토글 — 최신순 ↔ 오래된 순
+const SORT_SVG = `<svg class="ic" viewBox="0 0 24 24"><path d="M7 4v16"/><path d="m3 8 4-4 4 4"/><path d="M17 20V4"/><path d="m21 16-4 4-4-4"/></svg>`;
+btnSort.addEventListener('click', () => {
+  currentSort = currentSort === 'newest' ? 'oldest' : 'newest';
+  btnSort.innerHTML = SORT_SVG + (currentSort === 'newest' ? '최신순' : '오래된 순');
+  renderList();
+});
+
+// 모달 닫기 — 취소 버튼 / 스크림 클릭
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+deleteModal.addEventListener('click', e => { if (e.target === deleteModal) closeModal(); });
+
+// 5. 삭제 확인 → DELETE /api/records/{id}/
+document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+  if (pendingDeleteId === null) return;
+  const id = pendingDeleteId;
+  closeModal();
+
+  if (USE_DUMMY) {
+    // 더미: 로컬 배열에서만 제거
+    allRecords = allRecords.filter(r => r.id !== id);
+    renderList();
+    showToast('삭제했어요.', 'ok');
+  } else {
+    // 실제 API: DELETE /api/records/{id}/ → 204 No Content
+    try {
+      await apiFetch(`/api/records/${id}/`, { method: 'DELETE' });
+      allRecords = allRecords.filter(r => r.id !== id);
+      renderList();
+      showToast('삭제했어요.', 'ok');
+    } catch (err) {
+      showToast(err.message || '삭제에 실패했어요.', 'err');
+    }
+  }
+});
+
+/* ── 데이터 로드 ── */
+async function loadRecords() {
+  if (USE_DUMMY) {
+    allRecords = [...DUMMY_RECORDS];
+    renderList();
+    return;
+  }
+
+  // 실제 API: GET /api/records/?sort=-created_at
+  // 필터/정렬은 클라이언트에서 추가 처리 (서버 정렬은 기본값만 사용)
+  renderSkeleton();
+  try {
+    const data = await apiFetch('/api/records/?sort=-created_at');
+    allRecords = data.results ?? [];
+    renderList();
+  } catch (err) {
+    showToast(err.message || '이력을 불러오지 못했어요.', 'err');
+    renderEmpty();
+  }
+}
+
+/* ── 필터 + 정렬 후 렌더링 ── */
+function renderList() {
+  // 필터 적용
+  let filtered = currentMode
+    ? allRecords.filter(r => r.mode === currentMode)
+    : [...allRecords];
+
+  // 정렬 적용
+  filtered.sort((a, b) => {
+    const d = new Date(a.created_at) - new Date(b.created_at);
+    return currentSort === 'newest' ? -d : d;
+  });
+
+  if (!filtered.length) { renderEmpty(); return; }
+
+  listEl.innerHTML = filtered.map(r => {
+    // updated_at이 있고 created_at과 다를 때만 "수정됨" 표시
+    const isEdited = r.updated_at && r.created_at !== r.updated_at;
+    return `
+      <div class="sok-hrow" data-id="${r.id}" style="cursor:pointer">
+        <div class="meta">
+          <span class="date">${formatDate(r.created_at)}</span>
+          <div class="hrow-actions">
+            ${isEdited ? '<span class="sok-badge edited history-badge-sm">수정됨</span>' : ''}
+            <span class="sok-badge mode alt history-badge-sm">${modeLabel(r.mode)}</span>
+            <button class="sok-trash" title="삭제" data-delete-id="${r.id}">
+              <svg class="ic" viewBox="0 0 24 24">
+                <path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="orig">${escHtml(r.original_text)}</div>
+        <div class="res">${escHtml(r.purified_text)}</div>
+      </div>`;
+  }).join('');
+
+  // 2. 행 클릭 → editRecord 저장 후 detail.html 이동
+  listEl.querySelectorAll('.sok-hrow').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('.sok-trash')) return; // 휴지통 클릭은 제외
+      const record = allRecords.find(r => String(r.id) === row.dataset.id);
+      if (record) {
+        Store.set('editRecord', record);
+        window.location.href = 'detail.html';
+      }
+    });
+  });
+
+  // 5. 휴지통 클릭 → 삭제 모달
+  listEl.querySelectorAll('.sok-trash').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation(); // 행 클릭 이벤트 전파 차단
+      openModal(Number(btn.dataset.deleteId));
+    });
+  });
+}
+
+function renderEmpty() {
+  listEl.innerHTML = `
+    <div class="sok-empty">
+      <h3>아직 변환한 문장이 없어요</h3>
+      <p>거친 말을 입력하고 순화해 보세요.</p>
+    </div>`;
+}
+
+function renderSkeleton() {
+  listEl.innerHTML = Array(3).fill(`
+    <div class="sok-hrow">
+      <div class="sok-skel" style="height:13px;width:100px;margin-bottom:10px"></div>
+      <div class="sok-skel" style="height:13px;width:75%;margin-bottom:8px"></div>
+      <div class="sok-skel" style="height:17px;width:90%"></div>
+    </div>`).join('');
+}
+
+function openModal(id) { pendingDeleteId = id; deleteModal.style.display = 'flex'; }
+function closeModal()  { pendingDeleteId = null; deleteModal.style.display = 'none'; }
+
+/* ── 초기 실행 ── */
+loadRecords();
+</script>
+</body>
+</html>

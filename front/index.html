@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상욕순화기 · 홈</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #0c0c0c;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .screen {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    width: 440px;
+    min-height: 100vh;
+  }
+</style>
+</head>
+<body>
+<div class="sok screen sok-surface sok-grid">
+  <div class="sok-pad sok-z">
+    <div class="sok-appbar">
+      <div class="sok-logo">상<span class="acc">욕</span>순화기</div>
+      <button class="sok-iconbtn" title="변환 이력"><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l3 3"/></svg></button>
+    </div>
+    <h1 class="sok-h1" style="margin-bottom:8px">거친 말, 감정은 그대로<br>표현만 다듬어요.</h1>
+    <p class="sok-body" style="margin-bottom:24px">문장을 넣고 말투를 고르면 끝.</p>
+    <div class="sok-block-label">말투 모드</div>
+    <div class="sok-chips">
+      <button class="sok-chip is-active" data-mode="scholar">선비</button>
+      <button class="sok-chip" data-mode="trend">어쩔티비</button>
+      <button class="sok-chip" data-mode="rant">주접</button>
+      <button class="sok-chip" data-mode="cute">뿌잉뿌잉</button>
+      <button class="sok-chip" data-mode="interview">면접</button>
+    </div>
+    <div style="height:16px"></div>
+    <textarea class="sok-field" rows="5" placeholder="여기에 거친 말을 입력해봐.&#10;예) 아 ㅈㄴ 어이없네 진짜"></textarea>
+    <div class="sok-charcount" style="margin:7px 2px 20px">0 / 300</div>
+    <button class="sok-cta">순화하기</button>
+  </div>
+</div>
+<script src="common.js"></script>
+<script src="index.js"></script>
+</body>
+</html>

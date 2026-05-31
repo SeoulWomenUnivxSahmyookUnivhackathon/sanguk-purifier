@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상욕순화기 · 로딩</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="sok screen sok-surface sok-grid">
+  <div class="fillcol">
+    <div class="ld">
+      <div class="ring">
+        <svg class="r" viewBox="0 0 124 124"><circle class="track" cx="62" cy="62" r="56"/><circle class="arc" cx="62" cy="62" r="56"/></svg>
+        <div class="core">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 4.5l5 5L9 20l-5 1 1-5 9.5-11.5z"/>
+            <path class="spark2" d="M19 3.2l.6 1.6 1.6.6-1.6.6L19 7.6l-.6-1.6L16.8 5.4l1.6-.6z" fill="#111" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <p class="eyebrow">잠시만 기다려 주세요</p>
+      <h2>AI가 말을 다듬는 중…</h2>
+      <ul class="steps" id="steps">
+        <li data-st="pending"><span class="mk"><svg class="chk" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg></span>문장의 감정 분석</li>
+        <li data-st="pending"><span class="mk"><svg class="chk" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg></span>거친 표현 골라내기</li>
+        <li data-st="pending"><span class="mk"><svg class="chk" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg></span><span class="mode-text">선비 말투로 다듬기</span></li>
+      </ul>
+    </div>
+    <p class="ld-foot">보통 1~2초면 끝나요</p>
+  </div>
+</div>
+<script src="common.js"></script>
+<script>
+  'use strict';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. 세션에서 대기 중인 변환 파라미터 로드
+    const pending = Store.get('pendingConvert');
+    if (!pending) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // 2. 선택된 모드명 동적 세팅 (예: "어쩔티비 말투로 다듬기")
+    const modeTextEl = document.querySelector('.mode-text');
+    if (modeTextEl) {
+      modeTextEl.textContent = `${modeLabel(pending.mode)} 말투로 다듬기`;
+    }
+
+    const items = [...document.querySelectorAll('#steps li')];
+    let done = 0; // 현재 도달한 단계
+    let apiDone = false;
+    let apiError = null;
+
+    // 3. UI 렌더링 헬퍼
+    function render() {
+      items.forEach((li, i) => {
+        if (i < done) {
+          li.dataset.st = 'done';
+        } else if (i === done) {
+          li.dataset.st = 'active';
+        } else {
+          li.dataset.st = 'pending';
+        }
+      });
+    }
+
+    // 초기 활성화 상태 렌더링
+    render();
+
+    // 4. 애니메이션용 주기적 틱 가동 (최소 시각 만족 효과)
+    const tickInterval = setInterval(() => {
+      if (done < 2) {
+        done++;
+        render();
+      } else if (done === 2) {
+        // 마지막 단계 도달 시, 백그라운드 API 응답 대기
+        if (apiDone) {
+          clearInterval(tickInterval);
+          done = 3; // 모두 완료
+          render();
+          
+          // 체크마킹 확인 감상용 딜레이(350ms) 후 리다이렉트
+          setTimeout(() => {
+            Store.remove('pendingConvert');
+            window.location.href = 'result.html';
+          }, 350);
+        } else if (apiError) {
+          clearInterval(tickInterval);
+          showToast(apiError.message || '순화 처리에 실패했습니다.', 'err');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1500);
+        }
+      }
+    }, 550); // 각 스텝당 550ms 연출
+
+    // 5. 백그라운드 실제 API 가동
+    try {
+      const result = await API.convert(pending.text, pending.mode);
+      Store.set('convertResult', result);
+      apiDone = true;
+    } catch (err) {
+      console.error('[loading] API convert error:', err);
+      apiError = err;
+    }
+  });
+</script>
+</body>
+</html>
