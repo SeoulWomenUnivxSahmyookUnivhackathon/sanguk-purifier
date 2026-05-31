@@ -224,6 +224,11 @@
   padding-right: max(18px, env(safe-area-inset-right));
 }
 
+/* start · loading 처럼 sok-pad 없이 fillcol을 쓰는 화면용 safe-area 보정 */
+.sok-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* ---- Device / window frames (그림자 절제) ---- */
 .phone { width: 360px; padding: 9px; background: #000; border-radius: 46px; box-shadow: 0 0 0 1px #242424, 0 18px 44px rgba(0,0,0,0.35); }
 .phone-screen { position: relative; border-radius: 38px; overflow: hidden; min-height: 760px; background: var(--bg); }
@@ -285,7 +290,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* ← center에서 변경: 상단 잘림 방지 */
+  justify-content: flex-start; /* center → flex-start: 인앱 브라우저 상단 잘림 방지 */
 }
 
 .screen {
