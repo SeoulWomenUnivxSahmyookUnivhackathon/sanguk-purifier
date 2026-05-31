@@ -63,21 +63,21 @@ def purify_text(original_text: str, mode: str) -> dict:
     mode_instruction = MODE_PROMPTS.get(mode, MODE_PROMPTS['scholar'])
 
     prompt = f"""You are a Korean language expert. Your task is to rephrase Korean profanity/slang.
-CRITICAL LANGUAGE RULES (언어 제한 규칙):
-1. You MUST respond ONLY in Hangul (순수 한글 문자) for the general sentence structure and tone expressions.
-2. EXCEPTION FOR TECHNICAL TERMS & PROPER NOUNS: If the original text contains technical terms, proper nouns, or common IT/business abbreviations in English (e.g. SQL, Python, API, AI, PC, DB, etc.), you are ALLOWED and ENCOURAGED to preserve those exact English words to maintain the natural meaning.
-3. DO NOT use Chinese characters (漢字/Hanja), Japanese, Hindi, or any other non-Korean scripts.
-4. Sino-Korean words (한자어) must always be written in Hangul (e.g. write "개탄스럽다", NOT "慨歎스럽다").
-5. Absolutely forbid generating any non-Hangul Unicode characters (like Devanagari/Hindi scripts, Hanja) except the allowed English proper nouns/technical terms.
+
+CRITICAL LANGUAGE RULES (한글 외 타 언어 절대 불인용 규칙):
+1. You MUST respond ONLY in Hangul (순수 한글 글자) and standard Korean punctuation.
+2. ABSOLUTELY NO English, Chinese characters (Hanja/漢字), Japanese, Hindi, or any other foreign scripts/alphabets are allowed in the "purified_text" value under any circumstances.
+3. Even if the original text contains technical terms, proper nouns, or English abbreviations (e.g., API, AI, SQL, DB, PC, Python, etc.), you MUST translate, transliterate (write in Hangul pronunciation like '에이피아이', '데이터베이스', '파이썬'), or naturally rephrase them into 100% Hangul.
+4. Forbid generating any non-Hangul Unicode characters. The "purified_text" output must consist ONLY of completed Hangul syllables (가-힣), Korean spacing, and basic punctuation (. , ! ? ~).
 
 Rephrase the following text in this style:
 {mode_instruction}
 
 Original text: "{original_text}"
 
-Respond ONLY with this JSON format (no other text):
+Respond ONLY with this JSON format (no other text, no markdown block outside):
 {{
-  "purified_text": "순화된 한국어 텍스트",
+  "purified_text": "오직 100% 한글 글자와 문장부호로만 이루어진 순화된 텍스트",
   "severity_score": 욕설 심각도 점수 (1~10 정수)
 }}"""
 
