@@ -34,13 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ── 요소 참조 ── */
-  const sevBadge    = document.querySelector('.sok-badge.sev');
-  const editedBadge = document.querySelector('.sok-badge.edited');
-  const textarea    = document.querySelector('.sok-field');
-  const resultEl    = document.querySelector('.detail-result');
+  const sevBadge    = document.getElementById('sevBadge');
+  const editedBadge = document.getElementById('editedBadge');
+  const textarea    = document.getElementById('inputText');
+  const resultEl    = document.getElementById('resultBox');
   const chipsEl     = document.querySelector('.sok-chips');
-  const retryBtn    = document.querySelector('.sok-cta');
-  const backBtn     = document.querySelector('.sok-iconbtn[title="뒤로"]');
+  const retryBtn    = document.getElementById('btnRetry');
+  const backBtn     = document.getElementById('btnBack');
 
   const RETRY_DEFAULT_HTML = `
     <svg class="ic" viewBox="0 0 24 24">
@@ -137,14 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** record 데이터로 화면 전체 렌더링 */
   function renderDetail(rec) {
-    // 심각도 배지
-    const sev = rec.severity_score ?? 0;
-    if (sevBadge) {
-      sevBadge.innerHTML = `심각도 <span class="n">${sev}</span>/10`;
-      sevBadge.classList.remove('mid', 'low');
-      if (sev <= 3)      sevBadge.classList.add('low');
-      else if (sev <= 6) sevBadge.classList.add('mid');
-    }
+    // 심각도 배지 — common.js의 applySevClass 공통 함수 사용
+    applySevClass(sevBadge, rec.severity_score ?? 0);
 
     // 수정됨 배지 (updated_at 있을 때만)
     const isEdited = rec.updated_at && rec.created_at !== rec.updated_at;
@@ -170,11 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /** "현재 순화 결과 · {모드}" 레이블 업데이트 */
   function updateResultLabel(mode) {
-    if (!resultEl) return;
-    const label = resultEl.previousElementSibling;
-    if (label?.classList.contains('sok-block-label')) {
-      label.textContent = `현재 순화 결과 · ${modeLabel(mode)}`;
-    }
+    const label = document.getElementById('resultLabel');
+    if (label) label.textContent = `현재 순화 결과 · ${modeLabel(mode)}`;
   }
 
 });

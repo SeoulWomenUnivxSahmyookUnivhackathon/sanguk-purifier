@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ── DOM 요소 참조 ── */
-  const sevBadge = document.querySelector('.sok-badge.sev');
+  const sevBadge = document.getElementById('sevBadge');
   const modeBadge = document.querySelector('.sok-badge.mode');
   const origEl = document.querySelector('.sok-orig');
   const resultEl = document.querySelector('.sok-result');
@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const retryBtn = document.getElementById('retryBtn');
 
   /* ── 1. 데이터 동적 렌더링 ── */
-  // 심각도 점수 적용 및 색상 맵핑
+  // 심각도 점수 적용 및 색상 맵핑 — common.js의 applySevClass 사용
   if (sevBadge) {
-    applySevClass(sevBadge, result.severity_score ?? 1);
+    applySevClass(sevBadge, result.severity_score ?? 0);
   }
 
   // 모드 배지
