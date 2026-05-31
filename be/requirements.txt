@@ -1,0 +1,6 @@
+Django>=5.0
+groq
+python-dotenv
+gunicorn
+psycopg2-binary
+dj-database-url
