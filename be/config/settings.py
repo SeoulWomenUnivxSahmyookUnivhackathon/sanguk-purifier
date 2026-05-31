@@ -75,7 +75,7 @@ if not DEBUG:
     # 1. 쿠키 탈취 및 하이재킹 방지 (HTTPS 통신만 허용)
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False  # AJAX/Fetch 요청에서 자바스크립트가 csrftoken 쿠키를 읽을 수 있도록 허용 (필수)
     SESSION_COOKIE_HTTPONLY = True
 
     # 2. SSL/HTTPS 리다이렉션
