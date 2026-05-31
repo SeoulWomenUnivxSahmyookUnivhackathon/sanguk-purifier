@@ -13,6 +13,15 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* ── CSRF Warmup ──
+     첫 방문 시 POST 요청이 CSRF 토큰 미설정으로 실패하는 현상(403 Forbidden)을 방지하기 위해
+     안전한 백엔드 GET API를 조용히 호출하여 브라우저에 쿠키를 미리 심습니다. */
+  if (typeof API !== 'undefined' && typeof API.list === 'function') {
+    API.list().catch(err => {
+      console.warn('[CSRF Warmup] 무해한 초기화 호출:', err);
+    });
+  }
+
   /* ── DOM 요소 참조 ── */
   const textarea = document.querySelector('.sok-field');
   const charCounter = document.querySelector('.sok-charcount');
